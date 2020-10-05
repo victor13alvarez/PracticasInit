@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: ed4c2f1f3d6e44978b7c78a1f75e0f47
+  - enabled: 1
+    path: Assets/Scenes/DefinePlayersMinigolf.unity
+    guid: ea471cc31edc948b99b911f83afcee68
+  - enabled: 1
+    path: Assets/Scenes/MemoryGame.unity
+    guid: d0d825ef826874c5ca6d0ecebc93eb82
+  - enabled: 1
+    path: Assets/Scenes/Minigolf.unity
+    guid: 5e1310050fd11435e8d823cc022e9a43
+  - enabled: 0
+    path: Assets/Scenes/MinigolfTesting.unity
+    guid: 5da2d47e8b3524b90bb2384fdd232c19
+  - enabled: 1
+    path: Assets/Scenes/DefinePlayersMemory.unity
+    guid: 38450f8b767974015bb6f86207ac9e73
+  - enabled: 0
+    path: Assets/Scenes/MemoryTesting.unity
+    guid: 737f2e46a2ef742e483b5760bbbe4932
+  m_configObjects:
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ffa41e6727b064039a4c7354751af768,
+      type: 2}
