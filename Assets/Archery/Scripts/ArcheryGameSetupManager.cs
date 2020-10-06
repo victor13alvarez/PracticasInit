@@ -7,7 +7,7 @@ using System;
 
 public class ArcheryGameSetupManager : MonoBehaviour
 {
-    [SerializeField]int currentPlayers;
+    [SerializeField]int currentPlayers; //can be replaced by playerPanels.Count
     [SerializeField] int currentRounds;
     const int maxPlayers = 4;
     const int minPlayers = 1;
@@ -90,9 +90,16 @@ public class ArcheryGameSetupManager : MonoBehaviour
 
     public void AddColorToPlayer(string color, int player)
     {
-        print(color + " " + player);
+        playerPanels[player - 1].arrowColor = color;
     }
+    public void SetNameOfPlayer(string name, int player)
+    {
+        playerPanels[player - 1].playerName = name;
+    }
+    public void SetUpGameScene()
+    {
 
+    }
     private void OnGUI()
     {
         int x = 10;
@@ -104,9 +111,8 @@ public class ArcheryGameSetupManager : MonoBehaviour
             GUI.Box(new Rect(10, x, 1000, 200), item.playerPanel.name,style);
             x += 250;
         }
-
-        
     }
+
 
 }
 [System.Serializable]
@@ -118,6 +124,7 @@ public class PlayerInfo
     public int reaminingTurns { get; set; }
     public string arrowColor { get; set; }
     public GameObject playerPanel { get; }
+    public string playerName { get; set; }
 
     public PlayerInfo(GameObject playerPanel)
     {

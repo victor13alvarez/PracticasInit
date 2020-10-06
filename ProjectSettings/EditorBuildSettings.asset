@@ -26,6 +26,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/MemoryTesting.unity
     guid: 737f2e46a2ef742e483b5760bbbe4932
+  - enabled: 1
+    path: Assets/Scenes/DefinePlayersArchery.unity
+    guid: ae95906d723db4d48bfe01f0ffd32da0
+  - enabled: 1
+    path: Assets/Scenes/ArcheryGame.unity
+    guid: ca5f99e39f5894111ac90ae1317ba49b
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ffa41e6727b064039a4c7354751af768,
       type: 2}
