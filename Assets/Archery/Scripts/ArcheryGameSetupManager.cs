@@ -100,20 +100,6 @@ public class ArcheryGameSetupManager : MonoBehaviour
     {
 
     }
-    private void OnGUI()
-    {
-        int x = 10;
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 40;
-        style.alignment = TextAnchor.MiddleCenter;
-        foreach (var item in playerPanels)
-        {
-            GUI.Box(new Rect(10, x, 1000, 200), item.playerPanel.name,style);
-            x += 250;
-        }
-    }
-
-
 }
 [System.Serializable]
 public class PlayerInfo

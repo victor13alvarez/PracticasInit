@@ -4,27 +4,33 @@ using UnityEngine;
 
 public class ArcheryGameManager : MonoBehaviour
 {
-    public static ArcheryGameManager archeryGameManager;
-
-    public int rounds;
 
 
-    void Awake()
+    //public static ArcheryGameManager archeryGameManager;
+
+    //private void Awake()
+    //{
+    //    if (archeryGameManager == null)
+    //    {
+    //        archeryGameManager = this;
+    //        DontDestroyOnLoad(this.gameObject);
+    //    }
+    //    else
+    //        Destroy(this);
+    //}
+
+    public GameObject arrowPrefab;
+
+    public void ArrowWasThrowed()
     {
-        if (archeryGameManager != null)
-            GameObject.Destroy(archeryGameManager);
-        else
-            archeryGameManager = this;
-
-        DontDestroyOnLoad(this);
+        SpawnNewArrow();
     }
 
-    private void Update()
+    void SpawnNewArrow()
     {
-        //ManageTurns();
+        GameObject currentArrow = Instantiate(arrowPrefab);
+        currentArrow.tag = "Arrow";
     }
-    private void ManageTurns()
-    {
 
-    }
+
 }
