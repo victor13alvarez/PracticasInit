@@ -1,21 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.iOS;
+using UnityEngine.SceneManagement;
 
-
-public class ArcheryGameArrowThrowAndRenderer : MonoBehaviour
+public class ArrowManager : MonoBehaviour
 {
-    Scene parallelScene;
-    PhysicsScene parallelPhysicsScene;
 
     public Vector3 initialVelocity;
     public float forceMultiplicator = 100f;
     GameObject arrowObject;
-    GameObject targetObject;
-    LineRenderer lineRenderer;
-    ArcheryGameManager archeryGameManager;
+    public GameObject arrowPrefab;
 
     Vector3 mousePositionAtStart;
 
@@ -23,13 +18,14 @@ public class ArcheryGameArrowThrowAndRenderer : MonoBehaviour
     public float maximumForce = 500f;
     public float minimumForce = 0f;
     public float minimumXForce = -500f;
-    float maximumForceNormalized = 13;
-    float minimumForceNormalized = 3;
-    float minimumForceNormalizedX = -10f;
-    float maximumForceNormalizedX = 10f;
+    readonly float maximumForceNormalized = 13;
+    readonly float minimumForceNormalized = 3;
+    readonly float minimumForceNormalizedX = -10f;
+    readonly float maximumForceNormalizedX = 10f;
 
 
     public Transform startMousePosition;
+    public ArrowRenderer arrowRenderer;
 
     bool arrowIsgettingThrowed;
 
@@ -39,45 +35,15 @@ public class ArcheryGameArrowThrowAndRenderer : MonoBehaviour
     {
         Physics.autoSimulation = false;
         arrowIsgettingThrowed = false;
-        targetObject = GameObject.Find("Scenario");
-        lineRenderer = GetComponent<LineRenderer>();
-
-        CreateSceneParameters createSceneParameters = new CreateSceneParameters(LocalPhysicsMode.Physics3D);
-        parallelScene = SceneManager.CreateScene("ParallelScene", createSceneParameters);
-        parallelPhysicsScene = parallelScene.GetPhysicsScene();
-        archeryGameManager = FindObjectOfType<ArcheryGameManager>();
         arrowObject = GameObject.FindGameObjectWithTag("Arrow");
-
-
     }
 
-    void SimulatePhysics()
-    {
-        GameObject simulationObject = Instantiate(arrowObject);
-        GameObject simulationPlane = Instantiate(targetObject);
-
-        SceneManager.MoveGameObjectToScene(simulationObject, parallelScene);
-        SceneManager.MoveGameObjectToScene(simulationPlane, parallelScene);
-        simulationObject.GetComponent<Rigidbody>().useGravity = true;
-        simulationObject.GetComponent<Rigidbody>().velocity = arrowObject.GetComponent<Rigidbody>().velocity + initialVelocity;
-        simulationObject.GetComponent<Rigidbody>().angularVelocity = arrowObject.GetComponent<Rigidbody>().angularVelocity;
-        simulationObject.tag = "Untagged"; //Importante para las simulaciones y el escenario
-
-        for (int i = 0; i < lineRenderer.positionCount; i++)
-        {
-            parallelPhysicsScene.Simulate(Time.fixedDeltaTime);
-            lineRenderer.SetPosition(i, simulationObject.transform.position);
-            if (i > 0 && lineRenderer.GetPosition(i - 1).x == lineRenderer.GetPosition(i).x && lineRenderer.GetPosition(i - 1).z == lineRenderer.GetPosition(i).z)
-                lineRenderer.positionCount = i;
-        }
-        Destroy(simulationObject);
-        Destroy(simulationPlane);
-    }
+    
     void Shoot()
     {
-        lineRenderer.positionCount = 0;
         arrowObject.GetComponent<Rigidbody>().useGravity = true;
         arrowObject.GetComponent<Rigidbody>().velocity += initialVelocity;
+        arrowRenderer.ManageLineRenderer(false, 0);
     }
 
     // Update is called once per frame
@@ -88,7 +54,7 @@ public class ArcheryGameArrowThrowAndRenderer : MonoBehaviour
             if (Input.GetMouseButtonDown(0) && Vector2.Distance(Input.mousePosition, startMousePosition.position) <= 125f)
             {
                 mousePositionAtStart = Input.mousePosition;
-                lineRenderer.positionCount = 100;
+                arrowRenderer.ManageLineRenderer(true, 100);
                 mainPhysics = false;
                 initialVelocity = new Vector3(GetNormalizedValuesY(mousePositionAtStart.x, Input.mousePosition.x), GetNormalizedValuesY(mousePositionAtStart.y, Input.mousePosition.y), 10f);
             }
@@ -100,7 +66,7 @@ public class ArcheryGameArrowThrowAndRenderer : MonoBehaviour
                         initialVelocity.y = GetNormalizedValuesY(mousePositionAtStart.y, Input.mousePosition.y);
                     if (Input.mousePosition.x < Screen.width && Input.mousePosition.x > 0f)
                         initialVelocity.x = GetNormalizedValuesX(mousePositionAtStart.x, Input.mousePosition.x);
-                    SimulatePhysics();
+                    arrowRenderer.SimulatePhysics(arrowObject , initialVelocity);
                     arrowObject.transform.rotation = Quaternion.LookRotation(initialVelocity);
                 }
                 if (Input.GetMouseButtonUp(0))
@@ -130,10 +96,16 @@ public class ArcheryGameArrowThrowAndRenderer : MonoBehaviour
             SceneManager.GetActiveScene().GetPhysicsScene().Simulate(Time.fixedDeltaTime);
     }
 
-    public void ArrowHasImpacted()
+    public void ArrowHasImpacted(GameObject gameObject)
     {
-        archeryGameManager.ArrowWasThrowed();
-        arrowObject = GameObject.FindGameObjectWithTag("Arrow");
+        gameObject.tag = "Untagged";
+        Destroy(gameObject);
+        SpawnNewArrow();
+    }
+    private void SpawnNewArrow()
+    {
+        arrowObject = Instantiate(arrowPrefab);
+        arrowObject.tag = "Arrow";
         arrowIsgettingThrowed = false;
     }
 }

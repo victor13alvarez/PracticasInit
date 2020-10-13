@@ -28,8 +28,7 @@ public class ArcheryGameManager : MonoBehaviour
 
     void SpawnNewArrow()
     {
-        GameObject currentArrow = Instantiate(arrowPrefab);
-        currentArrow.tag = "Arrow";
+       
     }
 
 

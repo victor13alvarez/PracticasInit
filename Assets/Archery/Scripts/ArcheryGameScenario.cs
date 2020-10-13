@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class ArcheryGameScenario : MonoBehaviour
 {
-    public ArcheryGameArrowThrowAndRenderer archeryGameArrowThrowAndRenderer;
+    public ArrowManager archeryGameArrowThrowAndRenderer;
+    public ParticleSystem arrowParticles;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -14,8 +15,8 @@ public class ArcheryGameScenario : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Arrow"))
         {
-            collision.gameObject.tag = "Untagged";
-            archeryGameArrowThrowAndRenderer.ArrowHasImpacted();
+            archeryGameArrowThrowAndRenderer.ArrowHasImpacted(collision.gameObject);
+            Instantiate(arrowParticles, collision.GetContact(0).point,arrowParticles.transform.rotation);
         }
     }
 }
