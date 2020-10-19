@@ -41,8 +41,8 @@ TagManager:
   - Stick
   - Limits
   - Obstacles
-  - 
-  - 
+  - Arrow
+  - IgnoreCollision
   - 
   - 
   - 

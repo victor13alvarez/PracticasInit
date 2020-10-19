@@ -15,97 +15,100 @@ public class ArrowManager : MonoBehaviour
     Vector3 mousePositionAtStart;
 
     bool mainPhysics = true;
-    public float maximumForce = 500f;
+    public float maximumForce = 100f;
     public float minimumForce = 0f;
-    public float minimumXForce = -500f;
-    readonly float maximumForceNormalized = 13;
-    readonly float minimumForceNormalized = 3;
-    readonly float minimumForceNormalizedX = -10f;
-    readonly float maximumForceNormalizedX = 10f;
+    public float minimumXForce = -100f;
+    const float maximumForceNormalized = 3f;
+    const float minimumForceNormalized = 1f;
+    const float minimumForceNormalizedX = -3;
+    const float maximumForceNormalizedX = 3;
 
-
-    public Transform startMousePosition;
     public ArrowRenderer arrowRenderer;
-
-    bool arrowIsgettingThrowed;
+    private bool arrowIsgettingThrowed;
 
 
     // Start is called before the first frame update
     void Start()
     {
         Physics.autoSimulation = false;
-        arrowIsgettingThrowed = false;
         arrowObject = GameObject.FindGameObjectWithTag("Arrow");
+        Time.timeScale = .5f;
+
+        arrowIsgettingThrowed = false;
     }
 
-    
-    void Shoot()
-    {
-        arrowObject.GetComponent<Rigidbody>().useGravity = true;
-        arrowObject.GetComponent<Rigidbody>().velocity += initialVelocity;
-        arrowRenderer.ManageLineRenderer(false, 0);
-    }
-
-    // Update is called once per frame
     void Update()
     {
         if (!arrowIsgettingThrowed)
         {
-            if (Input.GetMouseButtonDown(0) && Vector2.Distance(Input.mousePosition, startMousePosition.position) <= 125f)
+            if (Input.GetMouseButtonDown(0))
             {
                 mousePositionAtStart = Input.mousePosition;
-                arrowRenderer.ManageLineRenderer(true, 100);
+                initialVelocity = new Vector3(0f, 0f, 5f);
                 mainPhysics = false;
-                initialVelocity = new Vector3(GetNormalizedValuesY(mousePositionAtStart.x, Input.mousePosition.x), GetNormalizedValuesY(mousePositionAtStart.y, Input.mousePosition.y), 10f);
+
+                arrowRenderer.ManageLineRenderer(true, 200);
             }
-            else if (!mainPhysics)
+            else if (Input.GetMouseButton(0))
             {
-                if (Input.GetMouseButton(0))
-                {
-                    if (Input.mousePosition.y > 0f && Input.mousePosition.y < mousePositionAtStart.y)
-                        initialVelocity.y = GetNormalizedValuesY(mousePositionAtStart.y, Input.mousePosition.y);
-                    if (Input.mousePosition.x < Screen.width && Input.mousePosition.x > 0f)
-                        initialVelocity.x = GetNormalizedValuesX(mousePositionAtStart.x, Input.mousePosition.x);
-                    arrowRenderer.SimulatePhysics(arrowObject , initialVelocity);
-                    arrowObject.transform.rotation = Quaternion.LookRotation(initialVelocity);
-                }
-                if (Input.GetMouseButtonUp(0))
-                {
-                    mainPhysics = true;
-                    arrowIsgettingThrowed = true;
-                    Shoot();
-                }
+                initialVelocity.y = GetNormalizedValuesY(mousePositionAtStart.y, Input.mousePosition.y);
+                initialVelocity.x = GetNormalizedValuesX(mousePositionAtStart.x, Input.mousePosition.x);
+
+                arrowRenderer.SimulatePhysics(arrowObject, initialVelocity);
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                arrowObject.GetComponent<Rigidbody>().useGravity = true;
+                arrowObject.GetComponent<Rigidbody>().velocity = initialVelocity;
+
+                arrowRenderer.ManageLineRenderer(false, 0);
+                mainPhysics = true;
+                arrowIsgettingThrowed = true;
             }
         }
-        else if(arrowObject != null && arrowObject.GetComponent<Rigidbody>().velocity != Vector3.zero) arrowObject.transform.rotation = Quaternion.LookRotation(arrowObject.GetComponent<Rigidbody>().velocity);
 
+        if (arrowObject != null && arrowObject.GetComponent<Rigidbody>().velocity != Vector3.zero)
+            arrowObject.transform.rotation = Quaternion.LookRotation(arrowObject.GetComponent<Rigidbody>().velocity);
     }
+
     float GetNormalizedValuesY(float startValue , float finalValue)
     {
-        return Mathf.Clamp(startValue - finalValue, 0, 500f) / (maximumForce - minimumForce) * (maximumForceNormalized - minimumForceNormalized) + minimumForceNormalized;
+        return Mathf.Clamp(startValue - finalValue, 0, maximumForce) / (maximumForce - minimumForce) * (maximumForceNormalized - minimumForceNormalized) + minimumForceNormalized;
     }
     float GetNormalizedValuesX(float startValue, float finalValue)
     {
-        return Mathf.Clamp(startValue - finalValue, -500f, 500f) / (maximumForce - minimumXForce) * (maximumForceNormalizedX - minimumForceNormalizedX);
+        return Mathf.Clamp(startValue - finalValue , minimumXForce, maximumForce) / (maximumForce - minimumXForce) * (maximumForceNormalizedX - minimumForceNormalizedX);
     }
 
     void FixedUpdate()
     {
-
         if (mainPhysics)
             SceneManager.GetActiveScene().GetPhysicsScene().Simulate(Time.fixedDeltaTime);
     }
 
-    public void ArrowHasImpacted(GameObject gameObject)
+    public void DestroyCurrentArrow()
     {
-        gameObject.tag = "Untagged";
-        Destroy(gameObject);
-        SpawnNewArrow();
+        if(arrowObject != null)
+        {
+            arrowObject.tag = "Untagged";
+            Destroy(arrowObject);
+        }
     }
-    private void SpawnNewArrow()
+
+    public void SpawnNewArrow(ArcheryGameManager archeryGameManager)
     {
-        arrowObject = Instantiate(arrowPrefab);
+        arrowObject = Instantiate(arrowPrefab,this.transform.parent);
+        arrowObject.GetComponent<ArrowHitManager>().archeryGameManager = archeryGameManager;
         arrowObject.tag = "Arrow";
         arrowIsgettingThrowed = false;
+    }
+
+    private void OnGUI()
+    {
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 100;
+        style.alignment = TextAnchor.MiddleCenter;
+        //GUI.Box(new Rect(10, 10, 1000, 200), (Vector2.Distance(Input.mousePosition, startMousePosition.position) <= 125f).ToString(), style);
+        GUI.Box(new Rect(10, 10, 1000, 200), initialVelocity.ToString(), style);
     }
 }

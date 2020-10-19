@@ -7,7 +7,6 @@ using System;
 
 public class ArcheryGameSetupManager : MonoBehaviour
 {
-    [SerializeField]int currentPlayers; //can be replaced by playerPanels.Count
     [SerializeField] int currentRounds;
     const int maxPlayers = 4;
     const int minPlayers = 1;
@@ -26,7 +25,6 @@ public class ArcheryGameSetupManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        currentPlayers = 0;
         currentRounds = 0;
         playerPanels.Clear();
         AddPlayer();
@@ -37,11 +35,10 @@ public class ArcheryGameSetupManager : MonoBehaviour
 
     public void AddPlayer()
     {
-        if (currentPlayers == maxPlayers)
+        if (playerPanels.Count == maxPlayers)
             return;
-        currentPlayers++;
         GameObject newGamePanel;
-        if (currentPlayers < 3)
+        if (playerPanels.Count < 2)
         {
             playerInputsPanelA.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = false;
             newGamePanel = Instantiate(playerPanel, playerInputsPanelA.transform);
@@ -52,21 +49,20 @@ public class ArcheryGameSetupManager : MonoBehaviour
             playerInputsPanelB.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = true;
             newGamePanel = Instantiate(playerPanel, playerInputsPanelB.transform);
         }
-        newGamePanel.name += currentPlayers;
-        playerPanels.Add(new PlayerInfo(newGamePanel));
+        playerPanels.Add(new PlayerInfo(newGamePanel , playerPanels.Count));
+        newGamePanel.name += playerPanels.Count;
         Instantiate(playerIcon, playersIconPanel.transform);
     }
     public void RemovePlayer()
     {
-        if (currentPlayers == minPlayers)
+        if (playerPanels.Count == minPlayers)
             return;
-        currentPlayers--;
-        if (currentPlayers < 3)
+        if (playerPanels.Count < 4)
             playerInputsPanelA.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = false;
 
         else
             playerInputsPanelB.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = true;
-        //Destroy(playerPanels[currentPlayers]);
+
         Destroy(playerPanels.Last<PlayerInfo>().playerPanel);
         playerPanels.Remove(playerPanels.Last<PlayerInfo>());
         Destroy(playersIconPanel.transform.GetChild(0).gameObject);
@@ -98,27 +94,32 @@ public class ArcheryGameSetupManager : MonoBehaviour
     }
     public void SetUpGameScene()
     {
-
+        GameObject archeryGameManager = Instantiate(new GameObject());
+        archeryGameManager.gameObject.name = "ArcheryGameManager";
+        ArcheryGameManager provisionalManger = archeryGameManager.AddComponent<ArcheryGameManager>();
+        provisionalManger.players = playerPanels.ToArray();
+        provisionalManger.totalRounds = currentRounds;
+        DontDestroyOnLoad(archeryGameManager);
     }
 }
 [System.Serializable]
 public class PlayerInfo
 {
     public int roundScore { get; set; }
-    public int finalScore { get;}
-    public int remainingArrows { get; set; }
+    public int finalScore { get; set; }
     public int reaminingTurns { get; set; }
     public string arrowColor { get; set; }
     public GameObject playerPanel { get; }
     public string playerName { get; set; }
 
-    public PlayerInfo(GameObject playerPanel)
+    public PlayerInfo(GameObject playerPanel, int currentPlayer)
     {
         this.roundScore = 0;
         this.finalScore = 0;
-        this.remainingArrows = 3;
         this.reaminingTurns = 3;
         this.arrowColor = "red";
         this.playerPanel = playerPanel;
+        this.playerName = "Player " + (currentPlayer+1).ToString() ;
+
     }
 }
