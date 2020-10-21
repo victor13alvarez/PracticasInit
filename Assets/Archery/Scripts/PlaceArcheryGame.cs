@@ -31,10 +31,24 @@ public class PlaceArcheryGame : MonoBehaviour
         if (!spawnDefined)
         {
 
+            /*
+             * 
+             * 
             UpdatePlacementPose();
             UpdatePlacementIndicator();
 
             if (placementPoseIsValid && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                PlaceObject();
+                spawnDefined = true;
+                placementIndicator.SetActive(false);
+                mainCanvas.GetComponent<CanvasInputArcheryGame>().IndicatorPlaced();
+                FindObjectOfType<ArcheryGameManager>().GameHasStarted();
+                Destroy(this.gameObject);
+            }
+            */
+
+            if (Input.GetKeyDown(KeyCode.A))
             {
                 PlaceObject();
                 spawnDefined = true;

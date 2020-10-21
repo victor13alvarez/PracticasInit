@@ -23,6 +23,7 @@ public class ArrowHitManager : MonoBehaviour
 
                 break;
             case "ArcheryTarget":
+                Debug.Log("Distancia respecto al centro: " + Vector3.Distance(collision.GetContact(0).point, collision.gameObject.GetComponent<MeshCollider>().bounds.center));
                 Instantiate(arrowHitted, collision.GetContact(0).point, arrowHitted.transform.rotation,this.transform.parent);
                 archeryGameManager.ArrowThrowed(100);
                 break;

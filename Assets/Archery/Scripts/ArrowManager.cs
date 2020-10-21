@@ -9,7 +9,8 @@ public class ArrowManager : MonoBehaviour
 
     public Vector3 initialVelocity;
     public float forceMultiplicator = 100f;
-    GameObject arrowObject;
+    internal GameObject arrowObject;
+    internal WindSimulation arrowWind;
     public GameObject arrowPrefab;
 
     Vector3 mousePositionAtStart;
@@ -28,7 +29,7 @@ public class ArrowManager : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         Physics.autoSimulation = false;
         arrowObject = GameObject.FindGameObjectWithTag("Arrow");
@@ -60,6 +61,7 @@ public class ArrowManager : MonoBehaviour
             {
                 arrowObject.GetComponent<Rigidbody>().useGravity = true;
                 arrowObject.GetComponent<Rigidbody>().velocity = initialVelocity;
+                arrowWind.AddWindToArrow(arrowObject);
 
                 arrowRenderer.ManageLineRenderer(false, 0);
                 mainPhysics = true;
@@ -101,14 +103,5 @@ public class ArrowManager : MonoBehaviour
         arrowObject.GetComponent<ArrowHitManager>().archeryGameManager = archeryGameManager;
         arrowObject.tag = "Arrow";
         arrowIsgettingThrowed = false;
-    }
-
-    private void OnGUI()
-    {
-        GUIStyle style = new GUIStyle();
-        style.fontSize = 100;
-        style.alignment = TextAnchor.MiddleCenter;
-        //GUI.Box(new Rect(10, 10, 1000, 200), (Vector2.Distance(Input.mousePosition, startMousePosition.position) <= 125f).ToString(), style);
-        GUI.Box(new Rect(10, 10, 1000, 200), initialVelocity.ToString(), style);
     }
 }
