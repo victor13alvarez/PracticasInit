@@ -25,8 +25,6 @@ public class WindSimulation : MonoBehaviour
     {
         NewWind();
         windSimulationIsActive = true;
-        print("WIND IS ACTIVE");
-        print(currentWindForce);
     }
 
     internal void RoundIsQuiet()

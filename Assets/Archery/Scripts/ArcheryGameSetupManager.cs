@@ -99,27 +99,27 @@ public class ArcheryGameSetupManager : MonoBehaviour
         ArcheryGameManager provisionalManger = archeryGameManager.AddComponent<ArcheryGameManager>();
         provisionalManger.players = playerPanels.ToArray();
         provisionalManger.totalRounds = currentRounds;
+        provisionalManger.SetPlayerRoundScore();
         DontDestroyOnLoad(archeryGameManager);
     }
 }
-[System.Serializable]
+
 public class PlayerInfo
 {
-    public int roundScore { get; set; }
+    public List<int> roundScore { get; set; }
     public int finalScore { get; set; }
     public int reaminingTurns { get; set; }
     public string arrowColor { get; set; }
     public GameObject playerPanel { get; }
     public string playerName { get; set; }
 
-    public PlayerInfo(GameObject playerPanel, int currentPlayer)
+    public PlayerInfo(GameObject ppanel, int currentPlayer)
     {
-        this.roundScore = 0;
-        this.finalScore = 0;
-        this.reaminingTurns = 3;
-        this.arrowColor = "red";
-        this.playerPanel = playerPanel;
-        this.playerName = "Player " + (currentPlayer+1).ToString() ;
-
+        roundScore = new List<int>();
+        finalScore = 0;
+        reaminingTurns = 3;
+        arrowColor = "red";
+        playerPanel = ppanel;
+        playerName = "Player " + (currentPlayer+1).ToString() ;
     }
 }

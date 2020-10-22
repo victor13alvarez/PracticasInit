@@ -56,10 +56,10 @@ public class CanvasInputArcheryGame : MonoBehaviour
         canvasDisplayCurrentGameInfo.SetActive(true);
     }
 
-    public void EndGame()
+    public void EndGame(int totalRounds, PlayerInfo [] players)
     {
         canvasDisplayCurrentGameInfo.SetActive(false);
-        buttons.SetActive(false);
         canvasEndGame.SetActive(true);
+        canvasEndGame.GetComponentInChildren<ScoreGird>().CreateScorePanel(totalRounds, players);
     }
 }
