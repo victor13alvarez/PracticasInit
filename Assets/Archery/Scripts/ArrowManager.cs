@@ -70,7 +70,7 @@ public class ArrowManager : MonoBehaviour
         }
 
         if (arrowObject != null && arrowObject.GetComponent<Rigidbody>().velocity != Vector3.zero)
-            arrowObject.transform.rotation = Quaternion.LookRotation(arrowObject.GetComponent<Rigidbody>().velocity);
+            arrowObject.transform.rotation = Quaternion.LookRotation(arrowObject.GetComponent<Rigidbody>().velocity) * Quaternion.Euler(0f,-90f,0f);
     }
 
     float GetNormalizedValuesY(float startValue , float finalValue)
