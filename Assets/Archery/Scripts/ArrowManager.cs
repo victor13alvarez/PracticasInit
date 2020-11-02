@@ -7,25 +7,28 @@ using UnityEngine.SceneManagement;
 public class ArrowManager : MonoBehaviour
 {
 
-    public Vector3 initialVelocity;
-    public float forceMultiplicator = 100f;
+    Vector3 initialVelocity;
     internal GameObject arrowObject;
     internal WindSimulation arrowWind;
     public GameObject arrowPrefab;
+    GameObject target;
 
-    Vector3 mousePositionAtStart;
+    Vector3 inputPosAtStart;
 
     bool mainPhysics = true;
-    public float maximumForce = 100f;
-    public float minimumForce = 0f;
-    public float minimumXForce = -100f;
-    const float maximumForceNormalized = 3f;
-    const float minimumForceNormalized = 1f;
-    const float minimumForceNormalizedX = -3;
-    const float maximumForceNormalizedX = 3;
+    const float maximumForce = 200f;
+    const float minimumForce = 0f;
+    const float minimumXForce = -200f;
+    const float maximumForceNormalized = 3.5f;
+    const float minimumForceNormalized = .5f;
+    const float minimumForceNormalizedX = -3.5f;
+    const float maximumForceNormalizedX = 3.5f;
 
     public ArrowRenderer arrowRenderer;
     private bool arrowIsgettingThrowed;
+    private bool arrowIsPrepared;
+
+    float xSpeed;
 
 
     // Start is called before the first frame update
@@ -33,44 +36,69 @@ public class ArrowManager : MonoBehaviour
     {
         Physics.autoSimulation = false;
         arrowObject = GameObject.FindGameObjectWithTag("Arrow");
-        Time.timeScale = .5f;
-
         arrowIsgettingThrowed = false;
+        target = GameObject.Find("ArcheryTarget");
     }
 
     void Update()
     {
+        Debug.DrawRay(arrowObject.transform.position, target.transform.position,Color.red);
         if (!arrowIsgettingThrowed)
         {
+#if UNITY_EDITOR
             if (Input.GetMouseButtonDown(0))
             {
-                mousePositionAtStart = Input.mousePosition;
-                initialVelocity = new Vector3(0f, 0f, 5f);
+                inputPosAtStart = Input.mousePosition;
+                initialVelocity = (target.transform.position - arrowObject.transform.position) * 3f;
+                initialVelocity.y = 0f;
                 mainPhysics = false;
-
-                arrowRenderer.ManageLineRenderer(true, 200);
+                arrowIsPrepared = true;
+                arrowRenderer.ManageLineRenderer(true, 100);
             }
             else if (Input.GetMouseButton(0))
             {
-                initialVelocity.y = GetNormalizedValuesY(mousePositionAtStart.y, Input.mousePosition.y);
-                initialVelocity.x = GetNormalizedValuesX(mousePositionAtStart.x, Input.mousePosition.x);
+                initialVelocity.y = GetNormalizedValuesY(inputPosAtStart.y, Input.mousePosition.y);
+                xSpeed = GetNormalizedValuesX(inputPosAtStart.x, Input.mousePosition.x);
+                arrowRenderer.SimulatePhysics(arrowObject, initialVelocity + new Vector3(xSpeed, 0f));
 
-                arrowRenderer.SimulatePhysics(arrowObject, initialVelocity);
             }
-            else if (Input.GetMouseButtonUp(0))
+            else if (arrowIsPrepared && Input.GetMouseButtonUp(0))
             {
-                arrowObject.GetComponent<Rigidbody>().useGravity = true;
-                arrowObject.GetComponent<Rigidbody>().velocity = initialVelocity;
-                arrowWind.AddWindToArrow(arrowObject);
-
-                arrowRenderer.ManageLineRenderer(false, 0);
-                mainPhysics = true;
+                initialVelocity.x += xSpeed;
                 arrowIsgettingThrowed = true;
+                arrowIsPrepared = false;
+                arrowRenderer.ManageLineRenderer(false, 0);
+                GetComponent<Animator>().SetTrigger("ArrowThrow");
+                //StartCoroutine(ArrowAnim());
             }
-        }
+#else
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                inputPosAtStart = Input.GetTouch(0).position;
+                initialVelocity = (target.transform.position - arrowObject.transform.position) * 3f ;
+                initialVelocity.y = 0f;
+                mainPhysics = false;
+                arrowIsPrepared = true;
+                arrowRenderer.ManageLineRenderer(true, 100);
+            }
+            else if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
+            {
+                initialVelocity.y = GetNormalizedValuesY(inputPosAtStart.y, Input.GetTouch(0).position.y);
+                xSpeed = GetNormalizedValuesX(inputPosAtStart.x, Input.GetTouch(0).position.x);
+                arrowRenderer.SimulatePhysics(arrowObject, initialVelocity + new Vector3(xSpeed,0f));
 
-        if (arrowObject != null && arrowObject.GetComponent<Rigidbody>().velocity != Vector3.zero)
-            arrowObject.transform.rotation = Quaternion.LookRotation(arrowObject.GetComponent<Rigidbody>().velocity) * Quaternion.Euler(0f,-90f,0f);
+            }
+            else if (arrowIsPrepared && Input.GetTouch(0).phase == TouchPhase.Ended)
+            {
+                initialVelocity.x += xSpeed;
+                arrowIsgettingThrowed = true;
+                arrowIsPrepared = false;
+                arrowRenderer.ManageLineRenderer(false, 0);
+                GetComponent<Animator>().SetTrigger("ArrowThrow");
+                //StartCoroutine(ArrowAnim());
+            }
+#endif
+        }
     }
 
     float GetNormalizedValuesY(float startValue , float finalValue)
@@ -103,5 +131,31 @@ public class ArrowManager : MonoBehaviour
         arrowObject.GetComponent<ArrowHitManager>().archeryGameManager = archeryGameManager;
         arrowObject.tag = "Arrow";
         arrowIsgettingThrowed = false;
+    }
+
+    public void MoveArrow()
+    {
+        StopCoroutine(ArrowAnim());
+        arrowObject.GetComponent<Rigidbody>().useGravity = true;
+        arrowObject.GetComponent<Rigidbody>().velocity = initialVelocity;
+        arrowWind.AddWindToArrow(arrowObject);
+        mainPhysics = true;
+    }
+
+    IEnumerator ArrowAnim()
+    {
+        float elapsedFrames = 0f;
+        float framesToWait = 100;
+        float elapsedTime = 0f;
+        float timeToWait = 5f;
+        Vector3 posToGo = new Vector3(0f, 2.85f, -30.74f);
+        while (elapsedFrames < framesToWait && elapsedTime < timeToWait)
+        {
+            arrowObject.transform.localPosition = Vector3.Lerp(arrowObject.transform.localPosition, posToGo,elapsedTime / timeToWait);
+            elapsedTime += Time.deltaTime;
+            elapsedFrames += 1;
+            yield return new WaitForEndOfFrame();
+        }
+        yield return null;
     }
 }

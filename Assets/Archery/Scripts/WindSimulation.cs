@@ -5,43 +5,63 @@ using UnityEngine;
 public class WindSimulation : MonoBehaviour
 {
     bool windSimulationIsActive;
-    private Vector3 currentWindForce;
-
+    [SerializeField]Vector3 currentWindForce;
+    public GameObject flagNoWindPrefab;
+    public GameObject flagWithWindPrefab;
+    Transform[] childTransforms;
+    private readonly GameObject[] flags = new GameObject[2];
     // Start is called before the first frame update
     private void Awake()
     {
-        currentWindForce = new Vector3(0f,0f,0f);
+        childTransforms = GetComponentsInChildren<Transform>();
+        SpawnFlags(flagNoWindPrefab);
     }
-
-    // Update is called once per frame
-
     void NewWind()
     {
-        currentWindForce.x = Random.value * Random.Range(.4f,1.2f);
-        currentWindForce.y = Random.value * Random.Range(.4f, .8f);
+        currentWindForce = Vector3.zero;
+        do
+        {
+            currentWindForce.x = Random.Range(-1.2f, 1.2f);
+        } while (currentWindForce.x == 0);
+        //currentWindForce.y = Random.value * Random.Range(.4f, .8f);
     }
 
-    internal void RoundHasWind()
+    public void RoundHasWind()
     {
         NewWind();
+        if (windSimulationIsActive)
+            return;
         windSimulationIsActive = true;
+        SpawnFlags(flagWithWindPrefab);
     }
 
-    internal void RoundIsQuiet()
+    public void RoundIsQuiet()
     {
+        if (!windSimulationIsActive)
+            return;
         windSimulationIsActive = false;
+        SpawnFlags(flagNoWindPrefab);
     }
 
-    internal void AddWindToArrow(GameObject arrowObject)
+    public void AddWindToArrow(GameObject arrowObject)
     {
+        print(windSimulationIsActive);
+        print(currentWindForce);
         if (windSimulationIsActive)
             arrowObject.GetComponent<Rigidbody>().velocity += currentWindForce;
     }
-    private void OnDrawGizmos()
+
+    private void SpawnFlags(GameObject typeOfFlag)
     {
-        Gizmos.color = Color.red;
-        GameObject toDraw = GameObject.Find("ArcheryTarget");
-        if(toDraw != null)
-            Gizmos.DrawSphere(GameObject.Find("ArcheryTarget").GetComponent<MeshCollider>().bounds.center, .05f);
+        for (int i = 1; i < childTransforms.Length; i++)
+        {
+           if (childTransforms[i].childCount != 0)
+            {
+                print("TIENE HIJOS");
+                Destroy(childTransforms[i].GetChild(0).gameObject);
+            }
+            flags[i - 1] = Instantiate(typeOfFlag, childTransforms[i]);
+            if (currentWindForce.x > 0) flags[i - 1].transform.Rotate(0f, 180f, 0f);
+        }
     }
 }

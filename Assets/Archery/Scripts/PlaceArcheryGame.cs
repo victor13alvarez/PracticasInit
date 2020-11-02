@@ -31,9 +31,18 @@ public class PlaceArcheryGame : MonoBehaviour
         if (!spawnDefined)
         {
 
-            /*
-             * 
-             * 
+            
+#if UNITY_EDITOR
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                PlaceObject();
+                spawnDefined = true;
+                placementIndicator.SetActive(false);
+                mainCanvas.GetComponent<CanvasInputArcheryGame>().IndicatorPlaced();
+                FindObjectOfType<ArcheryGameManager>().GameHasStarted();
+                Destroy(this.gameObject);
+            }
+#else
             UpdatePlacementPose();
             UpdatePlacementIndicator();
 
@@ -46,17 +55,7 @@ public class PlaceArcheryGame : MonoBehaviour
                 FindObjectOfType<ArcheryGameManager>().GameHasStarted();
                 Destroy(this.gameObject);
             }
-            */
-
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                PlaceObject();
-                spawnDefined = true;
-                placementIndicator.SetActive(false);
-                mainCanvas.GetComponent<CanvasInputArcheryGame>().IndicatorPlaced();
-                FindObjectOfType<ArcheryGameManager>().GameHasStarted();
-                Destroy(this.gameObject);
-            }
+#endif
         }
     }
 

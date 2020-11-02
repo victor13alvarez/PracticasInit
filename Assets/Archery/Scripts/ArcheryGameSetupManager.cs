@@ -40,14 +40,25 @@ public class ArcheryGameSetupManager : MonoBehaviour
         GameObject newGamePanel;
         if (playerPanels.Count < 2)
         {
-            playerInputsPanelA.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = false;
+            //playerInputsPanelA.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandHeight = false;
+            //f(playerPanels.Count ==  1) playerInputsPanelA.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = false;
             newGamePanel = Instantiate(playerPanel, playerInputsPanelA.transform);
+            if(playerPanels.Count == 1)
+            {
+                playerInputsPanelA.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childControlWidth = true;
+                playerInputsPanelA.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandWidth = true;
+            }
 
         }
         else
         {
-            playerInputsPanelB.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = true;
+            //playerInputsPanelB.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandHeight = true;
             newGamePanel = Instantiate(playerPanel, playerInputsPanelB.transform);
+            if (playerPanels.Count == 3)
+            {
+                playerInputsPanelB.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childControlWidth = true;
+                playerInputsPanelB.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandWidth = true;
+            }
         }
         playerPanels.Add(new PlayerInfo(newGamePanel , playerPanels.Count));
         newGamePanel.name += playerPanels.Count;
@@ -57,11 +68,17 @@ public class ArcheryGameSetupManager : MonoBehaviour
     {
         if (playerPanels.Count == minPlayers)
             return;
-        if (playerPanels.Count < 4)
-            playerInputsPanelA.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = false;
+        if (playerPanels.Count <= 2)
+        {
 
+            playerInputsPanelA.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childControlWidth = false;
+            playerInputsPanelA.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+        }
         else
-            playerInputsPanelB.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = true;
+        {
+            playerInputsPanelB.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childControlWidth = false;
+            playerInputsPanelB.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandWidth = false;
+        }
 
         Destroy(playerPanels.Last<PlayerInfo>().playerPanel);
         playerPanels.Remove(playerPanels.Last<PlayerInfo>());

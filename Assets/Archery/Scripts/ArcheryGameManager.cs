@@ -16,7 +16,6 @@ public class ArcheryGameManager : MonoBehaviour
 
     private void Awake()
     {
-        windSimulation = this.gameObject.AddComponent<WindSimulation>();
         currentPlayer = 0;
         currentRounds = 0;
     }
@@ -85,6 +84,7 @@ public class ArcheryGameManager : MonoBehaviour
     public void GameHasStarted()
     {
         arrowManager = FindObjectOfType<ArrowManager>();
+        windSimulation = FindObjectOfType<WindSimulation>();
         arrowManager.SpawnNewArrow(this);
         arrowManager.arrowWind = windSimulation;
         ManageRounds();
@@ -97,13 +97,12 @@ public class ArcheryGameManager : MonoBehaviour
         foreach (PlayerInfo player in players)
         {
             player.reaminingTurns = 3;
-            player.roundScore.ForEach(x => x=0);
+            player.roundScore.Clear();
             player.finalScore = 0;
         }
+        SetPlayerRoundScore();
         currentPlayer = 0;
-        currentRounds = 1;
-        canvasInputArcheryGame.SetGameInfoText(players[currentPlayer].playerName, players[currentPlayer].roundScore[currentRounds-1], currentRounds);
-        arrowManager.DestroyCurrentArrow();
-        arrowManager.SpawnNewArrow(this);
+        currentRounds = 0;
+        canvasInputArcheryGame.GetComponent<SceneChange>().changeScene("ArcheryGame");
     }
 }
