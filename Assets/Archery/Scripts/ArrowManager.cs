@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.iOS;
@@ -12,7 +13,7 @@ public class ArrowManager : MonoBehaviour
     internal WindSimulation arrowWind;
     public GameObject arrowPrefab;
     GameObject target;
-
+    List<GameObject> freezedArrows = new List<GameObject>();
     Vector3 inputPosAtStart;
 
     bool mainPhysics = true;
@@ -42,7 +43,6 @@ public class ArrowManager : MonoBehaviour
 
     void Update()
     {
-        Debug.DrawRay(arrowObject.transform.position, target.transform.position,Color.red);
         if (!arrowIsgettingThrowed)
         {
 #if UNITY_EDITOR
@@ -101,6 +101,25 @@ public class ArrowManager : MonoBehaviour
         }
     }
 
+    public void DestroyArrow()
+    {
+        if (arrowObject != null)
+        {
+            arrowObject.tag = "Untagged";
+            Destroy(arrowObject);
+        }
+    }
+
+    public void FreezeCurrentArrow()
+    {
+        if (arrowObject != null)
+        {
+            arrowObject.tag = "Untagged";
+            arrowObject.GetComponent<Collider>().isTrigger = true;
+            freezedArrows.Add(arrowObject);
+        }
+    }
+
     float GetNormalizedValuesY(float startValue , float finalValue)
     {
         return Mathf.Clamp(startValue - finalValue, 0, maximumForce) / (maximumForce - minimumForce) * (maximumForceNormalized - minimumForceNormalized) + minimumForceNormalized;
@@ -116,13 +135,13 @@ public class ArrowManager : MonoBehaviour
             SceneManager.GetActiveScene().GetPhysicsScene().Simulate(Time.fixedDeltaTime);
     }
 
-    public void DestroyCurrentArrow()
+    public void DestroyCurrentArrows()
     {
-        if(arrowObject != null)
+        freezedArrows.ForEach(delegate (GameObject go)
         {
-            arrowObject.tag = "Untagged";
-            Destroy(arrowObject);
-        }
+            Destroy(go);
+        });
+        freezedArrows.Clear();
     }
 
     public void SpawnNewArrow(ArcheryGameManager archeryGameManager)

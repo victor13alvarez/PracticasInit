@@ -6,13 +6,13 @@ using UnityEngine;
 public class ArcheryGameManager : MonoBehaviour
 {
     public PlayerInfo [] players { get; set; }
-    public int totalRounds { get; set; }
+    public int totalRounds;
     ArrowManager arrowManager;
     CanvasInputArcheryGame canvasInputArcheryGame;
     WindSimulation windSimulation;
     int currentPlayer;
     int currentRounds;
-
+    bool playerChanged = false;
 
     private void Awake()
     {
@@ -34,6 +34,7 @@ public class ArcheryGameManager : MonoBehaviour
         else
         {
             currentRounds++;
+            canvasInputArcheryGame.NewRound(currentRounds.ToString());
             foreach (PlayerInfo player in players)
             {
                 player.reaminingTurns = 3;
@@ -54,11 +55,18 @@ public class ArcheryGameManager : MonoBehaviour
 
     public void ArrowThrowed(int score)
     {
-        arrowManager.DestroyCurrentArrow();
+        if (score == 0)
+            arrowManager.DestroyArrow();
+        else
+            arrowManager.FreezeCurrentArrow();
         if(ManagePlayer(score))
             ManageRounds();
         canvasInputArcheryGame.SetGameInfoText(players[currentPlayer].playerName, players[currentPlayer].roundScore[currentRounds-1], currentRounds);
-        arrowManager.SpawnNewArrow(this);
+        if(playerChanged)
+            StartCoroutine(SpawnArrowDelay());
+        else
+            arrowManager.SpawnNewArrow(this);
+
     }
     bool ManagePlayer(int score)
     {
@@ -66,12 +74,17 @@ public class ArcheryGameManager : MonoBehaviour
         players[currentPlayer].reaminingTurns -= 1;
         if (players[currentPlayer].reaminingTurns == 0)
         {
+            playerChanged = true;
             if (currentPlayer == players.Length - 1)
             {
                 currentPlayer = 0;
+                arrowManager.DestroyCurrentArrows();
                 return true;
             }
-            else currentPlayer += 1;
+            currentPlayer += 1;
+            canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName);
+            arrowManager.DestroyCurrentArrows();
+
         }
         return false;
     }
@@ -85,10 +98,11 @@ public class ArcheryGameManager : MonoBehaviour
     {
         arrowManager = FindObjectOfType<ArrowManager>();
         windSimulation = FindObjectOfType<WindSimulation>();
-        arrowManager.SpawnNewArrow(this);
-        arrowManager.arrowWind = windSimulation;
-        ManageRounds();
         canvasInputArcheryGame = FindObjectOfType<CanvasInputArcheryGame>();
+        arrowManager.arrowWind = windSimulation;
+        StartCoroutine(SpawnArrowDelay());
+        ManageRounds();
+        canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName);
         canvasInputArcheryGame.SetGameInfoText(players[currentPlayer].playerName, players[currentPlayer].roundScore[currentRounds-1], currentRounds);
     }
 
@@ -104,5 +118,12 @@ public class ArcheryGameManager : MonoBehaviour
         currentPlayer = 0;
         currentRounds = 0;
         canvasInputArcheryGame.GetComponent<SceneChange>().changeScene("ArcheryGame");
+    }
+
+    IEnumerator SpawnArrowDelay()
+    {
+        playerChanged = false;
+        yield return new WaitForSeconds(2.5f);
+        arrowManager.SpawnNewArrow(this);
     }
 }

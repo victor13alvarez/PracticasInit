@@ -9,8 +9,8 @@ public class ArrowHitManager : MonoBehaviour
     public GameObject arrowMissed;
     private const int maximumScore = 200;
     private const int minimumScore = 0;
-    private const float minimumDist = 0.015f;
-    private const float maximimumDist = 0.13f;
+    private const float minimumDist = 0f;
+    private const float maximimumDist = 20f;
 
 
     private void Update()
@@ -30,7 +30,7 @@ public class ArrowHitManager : MonoBehaviour
 
         switch (collision.gameObject.name)
         {                
-            case "Scenario(Clone)":
+            case "Plane":
                 archeryGameManager.ArrowThrowed(0);
                 Instantiate(arrowMissed, collision.GetContact(0).point, arrowMissed.transform.rotation, this.transform.parent);
 

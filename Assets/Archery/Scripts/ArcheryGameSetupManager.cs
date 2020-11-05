@@ -111,13 +111,21 @@ public class ArcheryGameSetupManager : MonoBehaviour
     }
     public void SetUpGameScene()
     {
-        GameObject archeryGameManager = Instantiate(new GameObject());
-        archeryGameManager.gameObject.name = "ArcheryGameManager";
-        ArcheryGameManager provisionalManger = archeryGameManager.AddComponent<ArcheryGameManager>();
+        ArcheryGameManager provisionalManger;
+        if (FindObjectOfType<ArcheryGameManager>() == null)
+        {
+            GameObject archeryGameManager = Instantiate(new GameObject());
+            DontDestroyOnLoad(archeryGameManager);
+            archeryGameManager.gameObject.name = "ArcheryGameManager";
+            provisionalManger = archeryGameManager.AddComponent<ArcheryGameManager>();
+        }
+        else
+            provisionalManger = FindObjectOfType<ArcheryGameManager>();
+
+
         provisionalManger.players = playerPanels.ToArray();
         provisionalManger.totalRounds = currentRounds;
         provisionalManger.SetPlayerRoundScore();
-        DontDestroyOnLoad(archeryGameManager);
     }
 }
 

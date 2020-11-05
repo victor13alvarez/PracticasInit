@@ -14,7 +14,7 @@ public class PlaceArcheryGame : MonoBehaviour
     private bool placementPoseIsValid = false;
     public static bool spawnDefined;
     public GameObject mainCanvas;
-
+    private GameObject scenario;
 
     void Start()
     {
@@ -31,7 +31,7 @@ public class PlaceArcheryGame : MonoBehaviour
         if (!spawnDefined)
         {
 
-            
+
 #if UNITY_EDITOR
             if (Input.GetKeyDown(KeyCode.A))
             {
@@ -45,7 +45,6 @@ public class PlaceArcheryGame : MonoBehaviour
 #else
             UpdatePlacementPose();
             UpdatePlacementIndicator();
-
             if (placementPoseIsValid && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
             {
                 PlaceObject();
@@ -57,11 +56,14 @@ public class PlaceArcheryGame : MonoBehaviour
             }
 #endif
         }
+        //else
+            //UpdateScenarioPose();
     }
 
     private void PlaceObject()
     {
-        Instantiate(objectToPlace, placementPose.position, placementPose.rotation);
+        scenario = Instantiate(objectToPlace, placementPose.position, placementPose.rotation);
+        scenario.transform.position = new Vector3(scenario.transform.position.x, scenario.transform.position.y, scenario.transform.position.z);
     }
 
 
@@ -74,9 +76,7 @@ public class PlaceArcheryGame : MonoBehaviour
         }
 
         else
-        {
             placementIndicator.SetActive(false);
-        }
     }
 
 
