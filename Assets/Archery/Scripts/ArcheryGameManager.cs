@@ -5,36 +5,67 @@ using UnityEngine;
 
 public class ArcheryGameManager : MonoBehaviour
 {
-    public PlayerInfo [] players { get; set; }
+    public PlayerInfo[] players { get; set; }
     public int totalRounds;
+    int currentPlayer;
+    int currentRound;
+
     ArrowManager arrowManager;
     CanvasInputArcheryGame canvasInputArcheryGame;
     WindSimulation windSimulation;
-    int currentPlayer;
-    int currentRounds;
-    bool playerChanged = false;
 
-    private void Awake()
+
+    #region VariableMethods
+
+    public void SetUpGameInfo(PlayerInfo[] _playerInfos, int _totalRounds)
     {
-        currentPlayer = 0;
-        currentRounds = 0;
+        
+        players = _playerInfos;
+        totalRounds = _totalRounds;
+        SetUpGameInfo();
     }
-    public void SetPlayerRoundScore()
+    private void SetUpGameInfo()
+    {
+        currentRound = 0;
+        currentPlayer = 0;
+        SetPlayerRoundScore();
+    }
+    void SetPlayerRoundScore()
     {
         foreach (PlayerInfo player in players)
         {
+            player.reaminingTurns = 3;
+            player.finalScore = 0;
+            player.roundScore.Clear();
             for (int i = 0; i < totalRounds; i++)
                 player.roundScore.Add(0);
         }
     }
+
+    private void FindElementsInScene()
+    {
+        arrowManager = FindObjectOfType<ArrowManager>();
+        windSimulation = FindObjectOfType<WindSimulation>();
+        canvasInputArcheryGame = FindObjectOfType<CanvasInputArcheryGame>();
+    }
+
+    private void SetUpOtherSceneGObj()
+    {
+        arrowManager.arrowWind = windSimulation;
+        canvasInputArcheryGame.everythingIsPrepared = new Action(SpawnArrow);
+        canvasInputArcheryGame.LocateAnimationEnded();
+    }
+    #endregion
+
+    #region INGAME_METHODS
+
     void ManageRounds()
     {
-        if (currentRounds == totalRounds)
+        if (currentRound == totalRounds)
             EndGame();
         else
         {
-            currentRounds++;
-            canvasInputArcheryGame.NewRound(currentRounds.ToString());
+            currentRound++;
             foreach (PlayerInfo player in players)
             {
                 player.reaminingTurns = 3;
@@ -44,86 +75,72 @@ public class ArcheryGameManager : MonoBehaviour
                 windSimulation.RoundHasWind();
             else
                 windSimulation.RoundIsQuiet();
+
+            //TODO POPUP nueva Ronda
+            canvasInputArcheryGame.NewRoundTurn(currentRound);
         }
     }
-
-    private void EndGame()
+    void ManagePlayerTurn()
     {
-        canvasInputArcheryGame.EndGame(totalRounds , players);
-        Destroy(arrowManager.transform.parent.gameObject);
+        players[currentPlayer].reaminingTurns -= 1;
+        if (players[currentPlayer].reaminingTurns == 0)
+        {
+            if (currentPlayer == players.Length - 1)
+                currentPlayer = 0;
+            else currentPlayer += 1;
+            arrowManager.DestroyCurrentArrows();
+            //TODO POPUP nuevo jugador
+            canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName);
+        }
+        else
+            arrowManager.SpawnNewArrow(this);
     }
 
-    public void ArrowThrowed(int score)
+    void ManagePlayerScore(int score)
     {
+        players[currentPlayer].roundScore[currentRound - 1] += score;
+        players[currentPlayer].finalScore += score;
         if (score == 0)
             arrowManager.DestroyArrow();
         else
             arrowManager.FreezeCurrentArrow();
-        if(ManagePlayer(score))
-            ManageRounds();
-        canvasInputArcheryGame.SetGameInfoText(players[currentPlayer].playerName, players[currentPlayer].roundScore[currentRounds-1], currentRounds);
-        if(playerChanged)
-            StartCoroutine(SpawnArrowDelay());
-        else
-            arrowManager.SpawnNewArrow(this);
 
+        //TODO Cambiar score jugador
+        canvasInputArcheryGame.UpdatePlayerScore(players[currentPlayer].roundScore[currentRound - 1]);
     }
-    bool ManagePlayer(int score)
+
+    public void ArrowThrowed(int score)
     {
         ManagePlayerScore(score);
-        players[currentPlayer].reaminingTurns -= 1;
-        if (players[currentPlayer].reaminingTurns == 0)
-        {
-            playerChanged = true;
-            if (currentPlayer == players.Length - 1)
-            {
-                currentPlayer = 0;
-                arrowManager.DestroyCurrentArrows();
-                return true;
-            }
-            currentPlayer += 1;
-            canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName);
-            arrowManager.DestroyCurrentArrows();
-
-        }
-        return false;
+        ManagePlayerTurn();
+        if (players[players.Length - 1].reaminingTurns == 0)
+            ManageRounds();
     }
 
-    private void ManagePlayerScore(int score)
-    {
-        players[currentPlayer].roundScore[currentRounds-1] += score;
-        players[currentPlayer].finalScore += score;
-    }
+
+    void SpawnArrow() { arrowManager.SpawnNewArrow(this); }
+    #endregion
+
+
+
+    #region START RESET END
     public void GameHasStarted()
     {
-        arrowManager = FindObjectOfType<ArrowManager>();
-        windSimulation = FindObjectOfType<WindSimulation>();
-        canvasInputArcheryGame = FindObjectOfType<CanvasInputArcheryGame>();
-        arrowManager.arrowWind = windSimulation;
-        StartCoroutine(SpawnArrowDelay());
+        FindElementsInScene();
+        SetUpOtherSceneGObj();
         ManageRounds();
         canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName);
-        canvasInputArcheryGame.SetGameInfoText(players[currentPlayer].playerName, players[currentPlayer].roundScore[currentRounds-1], currentRounds);
     }
 
     public void ResetGame()
     {
-        foreach (PlayerInfo player in players)
-        {
-            player.reaminingTurns = 3;
-            player.roundScore.Clear();
-            player.finalScore = 0;
-        }
-        SetPlayerRoundScore();
-        currentPlayer = 0;
-        currentRounds = 0;
+        SetUpGameInfo();
         canvasInputArcheryGame.GetComponent<SceneChange>().changeScene("ArcheryGame");
     }
-
-    IEnumerator SpawnArrowDelay()
+    private void EndGame()
     {
-        playerChanged = false;
-        yield return new WaitForSeconds(2.5f);
-        arrowManager.SpawnNewArrow(this);
+        canvasInputArcheryGame.EndGame(totalRounds, players);
+        Destroy(arrowManager.transform.parent.gameObject);
     }
+    #endregion
 }

@@ -38,7 +38,6 @@ public class PlaceArcheryGame : MonoBehaviour
                 PlaceObject();
                 spawnDefined = true;
                 placementIndicator.SetActive(false);
-                mainCanvas.GetComponent<CanvasInputArcheryGame>().IndicatorPlaced();
                 FindObjectOfType<ArcheryGameManager>().GameHasStarted();
                 Destroy(this.gameObject);
             }
@@ -50,14 +49,13 @@ public class PlaceArcheryGame : MonoBehaviour
                 PlaceObject();
                 spawnDefined = true;
                 placementIndicator.SetActive(false);
-                mainCanvas.GetComponent<CanvasInputArcheryGame>().IndicatorPlaced();
                 FindObjectOfType<ArcheryGameManager>().GameHasStarted();
                 Destroy(this.gameObject);
             }
 #endif
         }
         //else
-            //UpdateScenarioPose();
+        //UpdateScenarioPose();
     }
 
     private void PlaceObject()

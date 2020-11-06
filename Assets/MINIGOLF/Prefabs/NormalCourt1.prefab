@@ -4405,8 +4405,12 @@ MonoBehaviour:
   stickObject: {fileID: 7702323058714779074}
   yellowStars: {fileID: 0}
   redStars: {fileID: 0}
+  greenStars: {fileID: 0}
+  blueStars: {fileID: 0}
   finalScore1: {fileID: 0}
   finalScore2: {fileID: 0}
+  finalScore3: {fileID: 0}
+  finalScore4: {fileID: 0}
 --- !u!1 &8795804407533742376
 GameObject:
   m_ObjectHideFlags: 0

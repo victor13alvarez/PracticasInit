@@ -40,8 +40,6 @@ public class ArcheryGameSetupManager : MonoBehaviour
         GameObject newGamePanel;
         if (playerPanels.Count < 2)
         {
-            //playerInputsPanelA.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandHeight = false;
-            //f(playerPanels.Count ==  1) playerInputsPanelA.gameObject.GetComponentInParent<VerticalLayoutGroup>().childForceExpandHeight = false;
             newGamePanel = Instantiate(playerPanel, playerInputsPanelA.transform);
             if(playerPanels.Count == 1)
             {
@@ -52,7 +50,6 @@ public class ArcheryGameSetupManager : MonoBehaviour
         }
         else
         {
-            //playerInputsPanelB.gameObject.GetComponentInParent<HorizontalLayoutGroup>().childForceExpandHeight = true;
             newGamePanel = Instantiate(playerPanel, playerInputsPanelB.transform);
             if (playerPanels.Count == 3)
             {
@@ -98,7 +95,6 @@ public class ArcheryGameSetupManager : MonoBehaviour
             return;
         currentRounds--;
         Destroy(roundsIconPanel.transform.GetChild(0).gameObject);
-
     }
 
     public void AddColorToPlayer(string color, int player)
@@ -109,23 +105,18 @@ public class ArcheryGameSetupManager : MonoBehaviour
     {
         playerPanels[player - 1].playerName = name;
     }
+
     public void SetUpGameScene()
     {
-        ArcheryGameManager provisionalManger;
         if (FindObjectOfType<ArcheryGameManager>() == null)
         {
             GameObject archeryGameManager = Instantiate(new GameObject());
             DontDestroyOnLoad(archeryGameManager);
             archeryGameManager.gameObject.name = "ArcheryGameManager";
-            provisionalManger = archeryGameManager.AddComponent<ArcheryGameManager>();
+            archeryGameManager.AddComponent<ArcheryGameManager>().SetUpGameInfo(playerPanels.ToArray(),currentRounds);
         }
         else
-            provisionalManger = FindObjectOfType<ArcheryGameManager>();
-
-
-        provisionalManger.players = playerPanels.ToArray();
-        provisionalManger.totalRounds = currentRounds;
-        provisionalManger.SetPlayerRoundScore();
+            FindObjectOfType<ArcheryGameManager>().SetUpGameInfo(playerPanels.ToArray(), currentRounds); ;
     }
 }
 
@@ -141,8 +132,6 @@ public class PlayerInfo
     public PlayerInfo(GameObject ppanel, int currentPlayer)
     {
         roundScore = new List<int>();
-        finalScore = 0;
-        reaminingTurns = 3;
         arrowColor = "red";
         playerPanel = ppanel;
         playerName = "Player " + (currentPlayer+1).ToString() ;

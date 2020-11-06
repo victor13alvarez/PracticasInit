@@ -15,34 +15,32 @@ public class CanvasInputArcheryGame : MonoBehaviour
     [SerializeField] GameObject roundPanelAnim;
     [SerializeField] Text roundPanelAnimText;
 
-    const string playerInfo = "CURRENT PLAYER : ";
-    const string playerScoreInfo = "PLAYER ROUND SCORE: ";
+    const string playerInfo = "CURRENT PLAYER:\n";
+    const string playerScoreInfo = "PLAYER ROUND SCORE:";
     const string currentRoundInfo = "CURRENT ROUND : ";
-    const string playerRound = " IS NOW PLAYING";
+    const string playerRound = " 'S TURN";
     const string currentRound = "ROUND ";
     Transform[] childButtons;
+
+    Animator c_Animator;
+
+    public Action everythingIsPrepared;
 
     public GameObject canvasLocateIndicator, canvasDisplayCurrentGameInfo, canvasEndGame, buttons;
 
     private void Awake()
     {
+        c_Animator = GetComponent<Animator>();
         ResetCanvas();
+        
     }
     public void ResetCanvas()
     {
         canvasLocateIndicator.SetActive(true);
-        canvasDisplayCurrentGameInfo.SetActive(false);
-        canvasEndGame.SetActive(false);
-        buttons.SetActive(true);
-        playerPanelAnim.SetActive(false);
-        roundPanelAnim.SetActive(false);
 
         childButtons = buttons.GetComponentsInChildren<Transform>();
         for (int i = childButtons.Length - 1; i > 0; i--)
             childButtons[i].gameObject.SetActive(false);
-
-        playerPanelAnim.transform.localScale = Vector3.zero;
-        roundPanelAnim.transform.localScale = Vector3.zero;
     }
     public void ResetGameButton()
     {
@@ -55,17 +53,9 @@ public class CanvasInputArcheryGame : MonoBehaviour
             childButtons[i].gameObject.SetActive(!childButtons[i].gameObject.activeSelf);
     }
 
-    public void SetGameInfoText(string playerName , int currentScore, int round)
+    public void UpdatePlayerScore(int score)
     {
-        playerNameText.text = playerInfo + playerName;
-        playerRoundScoreText.text = playerScoreInfo + currentScore.ToString();
-        currentRoundText.text = currentRoundInfo + round.ToString();
-    }
-
-    public void IndicatorPlaced()
-    {
-        canvasLocateIndicator.SetActive(false);
-        canvasDisplayCurrentGameInfo.SetActive(true);
+        playerRoundScoreText.text = score.ToString();
     }
 
     public void EndGame(int totalRounds, PlayerInfo [] players)
@@ -74,30 +64,40 @@ public class CanvasInputArcheryGame : MonoBehaviour
         canvasEndGame.SetActive(true);
         canvasEndGame.GetComponentInChildren<ScoreGird>().CreateScorePanel(totalRounds, players);
     }
-    public void NewPlayerTurn(string text)
+    public void NewPlayerTurn(string playerName)
     {
-        playerPanelAnimText.text = text + playerRound;
-        StartCoroutine(AnimatePanel(playerPanelAnim));
+        playerPanelAnimText.text = playerName.ToUpper() + playerRound;
+        playerNameText.text = playerName;
+        UpdatePlayerScore(0);
     }
-    public void NewRound(string text)
+    public void NewRoundTurn(int round)
     {
-        roundPanelAnimText.text = currentRound + text;
-        StartCoroutine(AnimatePanel(roundPanelAnim));
+        roundPanelAnimText.text = currentRound + round;
+        currentRoundText.text = round + "";
+        c_Animator.SetTrigger("RoundTrigger");
     }
-    IEnumerator AnimatePanel(GameObject panel)
-    {
-        float elapsedTime = 0;
-        panel.SetActive(true);
-        Vector3 scale = panel.transform.localScale;
 
-        while (elapsedTime < 2.5f)
-        {
-            scale = Vector3.Lerp(scale, Vector3.one, (elapsedTime / 2.5f));
-            panel.transform.localScale = scale;
-            elapsedTime += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
-        panel.transform.localScale = Vector3.zero;
-        panel.SetActive(false);
+
+    #region ANIMATIONS
+    public void LocateAnimationEnded()
+    {
+        c_Animator.SetBool("PlacementBool", true);
+        canvasLocateIndicator.SetActive(false);
+        //canvasDisplayCurrentGameInfo.SetActive(true);
     }
+    public void RoundAnimationEnded()
+    {
+        c_Animator.SetTrigger("PlayerTrigger");
+    }
+
+    public void PlayerAnimationEnded()
+    {
+        c_Animator.SetTrigger("InfoInGameTrigger");
+    }
+    public void InfoInGameAnimationEnded()
+    {
+        everythingIsPrepared.Invoke();
+    }
+
+    #endregion
 }
