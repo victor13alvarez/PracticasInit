@@ -43,7 +43,7 @@ public class ArrowManager : MonoBehaviour
 
     void Update()
     {
-        if (!arrowIsgettingThrowed)
+        if (!arrowIsgettingThrowed && arrowObject != null)
         {
 #if UNITY_EDITOR
             if (Input.GetMouseButtonDown(0))

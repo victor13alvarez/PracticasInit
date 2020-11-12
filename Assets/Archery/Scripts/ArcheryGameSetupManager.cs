@@ -97,9 +97,9 @@ public class ArcheryGameSetupManager : MonoBehaviour
         Destroy(roundsIconPanel.transform.GetChild(0).gameObject);
     }
 
-    public void AddColorToPlayer(string color, int player)
+    public void AddColorToPlayer(Color color, int player)
     {
-        playerPanels[player - 1].arrowColor = color;
+        playerPanels[player - 1].playerColor = color;
     }
     public void SetNameOfPlayer(string name, int player)
     {
@@ -125,14 +125,14 @@ public class PlayerInfo
     public List<int> roundScore { get; set; }
     public int finalScore { get; set; }
     public int reaminingTurns { get; set; }
-    public string arrowColor { get; set; }
+    public Color playerColor { get; set; }
     public GameObject playerPanel { get; }
     public string playerName { get; set; }
 
     public PlayerInfo(GameObject ppanel, int currentPlayer)
     {
         roundScore = new List<int>();
-        arrowColor = "red";
+        playerColor = Color.black;
         playerPanel = ppanel;
         playerName = "Player " + (currentPlayer+1).ToString() ;
     }

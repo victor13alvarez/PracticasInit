@@ -10,14 +10,10 @@ public class CanvasInputArcheryGame : MonoBehaviour
     [SerializeField] Text playerNameText;
     [SerializeField] Text playerRoundScoreText;
     [SerializeField] Text currentRoundText;
-    [SerializeField] GameObject playerPanelAnim;
+
     [SerializeField] Text playerPanelAnimText;
-    [SerializeField] GameObject roundPanelAnim;
     [SerializeField] Text roundPanelAnimText;
 
-    const string playerInfo = "CURRENT PLAYER:\n";
-    const string playerScoreInfo = "PLAYER ROUND SCORE:";
-    const string currentRoundInfo = "CURRENT ROUND : ";
     const string playerRound = " 'S TURN";
     const string currentRound = "ROUND ";
     Transform[] childButtons;
@@ -60,16 +56,23 @@ public class CanvasInputArcheryGame : MonoBehaviour
 
     public void EndGame(int totalRounds, PlayerInfo [] players)
     {
-        canvasDisplayCurrentGameInfo.SetActive(false);
-        canvasEndGame.SetActive(true);
+        c_Animator.SetTrigger("GameEnded");
         canvasEndGame.GetComponentInChildren<ScoreGird>().CreateScorePanel(totalRounds, players);
+        Invoke("ActiveEndGamePanel", 1f);
     }
-    public void NewPlayerTurn(string playerName)
+    private void ActiveEndGamePanel()
+    {
+        canvasEndGame.SetActive(true);
+    }
+    public void NewPlayerTurn(string playerName, int currentPlayer)
     {
         playerPanelAnimText.text = playerName.ToUpper() + playerRound;
         playerNameText.text = playerName;
+        if (currentPlayer != 0)
+            RoundAnimationEnded();
         UpdatePlayerScore(0);
     }
+
     public void NewRoundTurn(int round)
     {
         roundPanelAnimText.text = currentRound + round;

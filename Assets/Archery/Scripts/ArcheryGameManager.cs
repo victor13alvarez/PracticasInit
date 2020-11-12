@@ -88,12 +88,17 @@ public class ArcheryGameManager : MonoBehaviour
             if (currentPlayer == players.Length - 1)
                 currentPlayer = 0;
             else currentPlayer += 1;
-            arrowManager.DestroyCurrentArrows();
             //TODO POPUP nuevo jugador
-            canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName);
+            Invoke(nameof(DestroyArrows), .5f);
+            canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName, currentPlayer);
         }
         else
             arrowManager.SpawnNewArrow(this);
+    }
+
+    void DestroyArrows()
+    {
+        arrowManager.DestroyCurrentArrows();
     }
 
     void ManagePlayerScore(int score)
@@ -101,7 +106,7 @@ public class ArcheryGameManager : MonoBehaviour
         players[currentPlayer].roundScore[currentRound - 1] += score;
         players[currentPlayer].finalScore += score;
         if (score == 0)
-            arrowManager.DestroyArrow();
+            DestroyArrows();
         else
             arrowManager.FreezeCurrentArrow();
 
@@ -129,7 +134,7 @@ public class ArcheryGameManager : MonoBehaviour
         FindElementsInScene();
         SetUpOtherSceneGObj();
         ManageRounds();
-        canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName);
+        canvasInputArcheryGame.NewPlayerTurn(players[currentPlayer].playerName, currentPlayer);
     }
 
     public void ResetGame()
@@ -140,6 +145,12 @@ public class ArcheryGameManager : MonoBehaviour
     private void EndGame()
     {
         canvasInputArcheryGame.EndGame(totalRounds, players);
+        Invoke("DestroyScene", 1f);
+        
+    }
+
+    void DestroyScene()
+    {
         Destroy(arrowManager.transform.parent.gameObject);
     }
     #endregion

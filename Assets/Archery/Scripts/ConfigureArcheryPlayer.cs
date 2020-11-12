@@ -3,51 +3,79 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
+
 public class ConfigureArcheryPlayer : MonoBehaviour
 {
     private ArcheryGameSetupManager archeryGameSetupManager;
+    static Dictionary<int, bool> selectColor = new Dictionary<int, bool>();
     int playerNum;
     public TMP_Text placeHolder;
     public Image image;
+    int currentColor = 0;
+    Color[] colors = { Color.red ,Color.blue , Color.green , Color.magenta , Color.yellow };
+    string playerNumS;
+
+    bool onValueChangedIgnore;
+
+    [SerializeField] Slider playerSlider;
+
+    private void Awake()
+    {
+        if(selectColor.Count == 0)
+            for (int i = 0; i < 5; i++)
+                selectColor.Add(i, false);
+        onValueChangedIgnore = false;
+
+    }
     void Start()
     {
         archeryGameSetupManager = FindObjectOfType<ArcheryGameSetupManager>();
-        string playerName = this.gameObject.name;
-        playerNum = int.Parse(playerName.Substring(playerName.Length - 1));
+        playerNumS = this.gameObject.name.Substring(this.gameObject.name.Length - 1).ToString();
+        playerNum = int.Parse(playerNumS);
         placeHolder.text = "Player " + playerNum;
-        image.color = Color.red;
+        GenerateFreeColor();
+    }
+
+    void GenerateFreeColor()
+    {
+        while (selectColor[currentColor])
+            currentColor += 1;
+
+        selectColor[currentColor] = true;
+        image.color = colors[currentColor];
+        onValueChangedIgnore = !onValueChangedIgnore;
+        playerSlider.value = currentColor;
+        onValueChangedIgnore = !onValueChangedIgnore;
     }
 
     public void ChangeColorOfPlayer(Slider slider)
     {
-        string playerNumS = this.gameObject.name.Substring(this.gameObject.name.Length - 1).ToString();
-        playerNum = int.Parse(playerNumS);
-        switch (slider.value)
+        if (onValueChangedIgnore)
+            return;
+        if (CheckIfColorIsAlreadyPicked((int)slider.value))
         {
-            default:
-                break;
-            case 0:
-                archeryGameSetupManager.AddColorToPlayer("red", playerNum);
-                image.color = Color.red;
-                break;
-            case 1:
-                archeryGameSetupManager.AddColorToPlayer("blue", playerNum);
-                image.color = Color.blue;
-                break;
-            case 2:
-                archeryGameSetupManager.AddColorToPlayer("green", playerNum);
-                image.color = Color.green;
-                break;
-            case 3:
-                archeryGameSetupManager.AddColorToPlayer("pink", playerNum);
-                image.color = Color.magenta;
-                break;
-            case 4:
-                archeryGameSetupManager.AddColorToPlayer("yellow", playerNum);
-                image.color = Color.yellow;
-                break;
+            selectColor[currentColor] = false;
+            currentColor = (int)slider.value;
+            selectColor[currentColor] = true;
+            archeryGameSetupManager.AddColorToPlayer(colors[currentColor], playerNum);
+            image.color = colors[currentColor];
+        }
+        else
+        {
+            onValueChangedIgnore = !onValueChangedIgnore;
+            playerSlider.value = currentColor;
+            onValueChangedIgnore = !onValueChangedIgnore;
         }
     }
+
+    private bool CheckIfColorIsAlreadyPicked(int value)
+    {
+        if (selectColor[value] == true)
+            return false;
+        return true;
+    }
+
     public void SetPlayerName(TMP_Text text)
     {
         archeryGameSetupManager.SetNameOfPlayer(text.text.ToString(), playerNum);

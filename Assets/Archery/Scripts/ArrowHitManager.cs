@@ -10,9 +10,12 @@ public class ArrowHitManager : MonoBehaviour
     private const int maximumScore = 200;
     private const int minimumScore = 0;
     private const float minimumDist = 0f;
-    private const float maximimumDist = 20f;
+    private float maximimumDist = 2f;
 
-
+    private void Start()
+    {
+        maximimumDist = GameObject.Find("ArcheryTarget").GetComponent<MeshCollider>().bounds.size.y;
+    }
     private void Update()
     {
         if (GetComponent<Rigidbody>().velocity != Vector3.zero)

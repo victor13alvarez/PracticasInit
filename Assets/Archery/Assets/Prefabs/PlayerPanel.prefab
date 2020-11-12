@@ -850,6 +850,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   placeHolder: {fileID: 2831340391180294043}
   image: {fileID: 2648841535200754421}
+  playerSlider: {fileID: 5514046574327981079}
 --- !u!1 &2240390065559133724
 GameObject:
   m_ObjectHideFlags: 0
