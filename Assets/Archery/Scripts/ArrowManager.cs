@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.iOS;
 using UnityEngine.SceneManagement;
 
@@ -13,6 +14,7 @@ public class ArrowManager : MonoBehaviour
     internal WindSimulation arrowWind;
     public GameObject arrowPrefab;
     GameObject target;
+    GameObject _OptionsButtons;
     List<GameObject> freezedArrows = new List<GameObject>();
     Vector3 inputPosAtStart;
 
@@ -39,6 +41,7 @@ public class ArrowManager : MonoBehaviour
         arrowObject = GameObject.FindGameObjectWithTag("Arrow");
         arrowIsgettingThrowed = false;
         target = GameObject.Find("ArcheryTarget");
+        _OptionsButtons = GameObject.Find("OptionsButtons");
     }
 
     void Update()
@@ -46,7 +49,7 @@ public class ArrowManager : MonoBehaviour
         if (!arrowIsgettingThrowed && arrowObject != null)
         {
 #if UNITY_EDITOR
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 inputPosAtStart = Input.mousePosition;
                 initialVelocity = (target.transform.position - arrowObject.transform.position) * 3f;
@@ -72,7 +75,7 @@ public class ArrowManager : MonoBehaviour
                 //StartCoroutine(ArrowAnim());
             }
 #else
-            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began && !EventSystem.current.IsPointerOverGameObject())
             {
                 inputPosAtStart = Input.GetTouch(0).position;
                 initialVelocity = (target.transform.position - arrowObject.transform.position) * 3f ;
@@ -120,16 +123,16 @@ public class ArrowManager : MonoBehaviour
         }
     }
 
-    float GetNormalizedValuesY(float startValue , float finalValue)
+    float GetNormalizedValuesY(float startValue, float finalValue)
     {
         return Mathf.Clamp(startValue - finalValue, 0, maximumForce) / (maximumForce - minimumForce) * (maximumForceNormalized - minimumForceNormalized) + minimumForceNormalized;
     }
     float GetNormalizedValuesX(float startValue, float finalValue)
     {
-        return Mathf.Clamp(startValue - finalValue , minimumXForce, maximumForce) / (maximumForce - minimumXForce) * (maximumForceNormalizedX - minimumForceNormalizedX);
+        return Mathf.Clamp(startValue - finalValue, minimumXForce, maximumForce) / (maximumForce - minimumXForce) * (maximumForceNormalizedX - minimumForceNormalizedX);
     }
 
-    void FixedUpdate()
+    void FixedUpdate() //This is used in order to be possible to simulate physics in other scenes
     {
         if (mainPhysics)
             SceneManager.GetActiveScene().GetPhysicsScene().Simulate(Time.fixedDeltaTime);
@@ -146,7 +149,7 @@ public class ArrowManager : MonoBehaviour
 
     public void SpawnNewArrow(ArcheryGameManager archeryGameManager)
     {
-        arrowObject = Instantiate(arrowPrefab,this.transform.parent);
+        arrowObject = Instantiate(arrowPrefab, this.transform.parent);
         arrowObject.GetComponent<ArrowHitManager>().archeryGameManager = archeryGameManager;
         arrowObject.tag = "Arrow";
         arrowIsgettingThrowed = false;
@@ -170,11 +173,28 @@ public class ArrowManager : MonoBehaviour
         Vector3 posToGo = new Vector3(0f, 2.85f, -30.74f);
         while (elapsedFrames < framesToWait && elapsedTime < timeToWait)
         {
-            arrowObject.transform.localPosition = Vector3.Lerp(arrowObject.transform.localPosition, posToGo,elapsedTime / timeToWait);
+            arrowObject.transform.localPosition = Vector3.Lerp(arrowObject.transform.localPosition, posToGo, elapsedTime / timeToWait);
             elapsedTime += Time.deltaTime;
             elapsedFrames += 1;
             yield return new WaitForEndOfFrame();
         }
         yield return null;
     }
+
+    private void OnGUI()
+    {
+        float size = 100;
+        GUIStyle style = new GUIStyle
+        {
+            fontSize = 100,
+            alignment = TextAnchor.MiddleCenter
+        };
+        GUIContent gUIContent = new GUIContent
+        {
+            text = EventSystem.current.IsPointerOverGameObject().ToString(),
+        };
+        
+        GUI.Label(new Rect(Screen.width / 2 - size, Screen.height / 2 - size, size, size), gUIContent, style);
+    }
 }
+

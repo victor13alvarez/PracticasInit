@@ -16,19 +16,29 @@ public class PlaceArcheryGame : MonoBehaviour
     public GameObject mainCanvas;
     private GameObject scenario;
 
+    bool timeToLoad;
+
     void Start()
     {
         arOrigin = FindObjectOfType<ARSessionOrigin>();
         spawnDefined = false;
+        timeToLoad = false;
+        StartCoroutine(LoadComplete());
 
 #if UNITY_ANDROID
 		arRaycastManager = FindObjectOfType<ARRaycastManager>();
 #endif
     }
 
+    IEnumerator LoadComplete()
+    {
+        yield return new WaitForSeconds(1);
+        timeToLoad = true;
+    }
+
     void Update()
     {
-        if (!spawnDefined)
+        if (!spawnDefined && timeToLoad)
         {
 
 
@@ -54,8 +64,6 @@ public class PlaceArcheryGame : MonoBehaviour
             }
 #endif
         }
-        //else
-        //UpdateScenarioPose();
     }
 
     private void PlaceObject()

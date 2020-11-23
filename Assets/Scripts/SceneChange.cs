@@ -7,6 +7,11 @@ public class SceneChange : MonoBehaviour
 {
 
     public static string sceneName = "";
+    public static SceneChange scene_Manager;
+    private void Awake()
+    {
+        scene_Manager = this;
+    }
 
     public void changeScene(string sceneName)
     {

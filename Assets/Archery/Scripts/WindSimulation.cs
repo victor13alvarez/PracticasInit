@@ -5,10 +5,10 @@ using UnityEngine;
 public class WindSimulation : MonoBehaviour
 {
     bool windSimulationIsActive;
-    [SerializeField]Vector3 currentWindForce;
-    [SerializeField] GameObject flagNoWindPrefab;
-    [SerializeField] GameObject flagWithWindPrefab;
-    [SerializeField] GameObject windZone;
+    Vector3 currentWindForce;
+    public GameObject flagNoWindPrefab;
+    public GameObject flagWithWindPrefab;
+    public GameObject windZone;
     Transform[] childTransforms;
     private readonly GameObject[] flags = new GameObject[2];
     // Start is called before the first frame update

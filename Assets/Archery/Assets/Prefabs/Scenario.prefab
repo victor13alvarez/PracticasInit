@@ -1476,7 +1476,7 @@ GameObject:
   - component: {fileID: 3261486285377837380}
   - component: {fileID: 3262802688582272894}
   m_Layer: 0
-  m_Name: Petals Prefab 2
+  m_Name: WindParticles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

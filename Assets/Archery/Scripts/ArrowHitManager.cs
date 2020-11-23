@@ -21,7 +21,6 @@ public class ArrowHitManager : MonoBehaviour
         if (GetComponent<Rigidbody>().velocity != Vector3.zero)
         {
             this.transform.rotation = Quaternion.LookRotation(this.GetComponent<Rigidbody>().velocity) * Quaternion.Euler(0f, -90f, 0f);
-            Time.timeScale = .5f;
         }
     }
     private void OnCollisionEnter(Collision collision)

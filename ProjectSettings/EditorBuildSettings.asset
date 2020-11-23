@@ -26,9 +26,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ArcheryGame.unity
     guid: ca5f99e39f5894111ac90ae1317ba49b
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/ArcheryGame_GameOver.unity
+    guid: 43a948a74496c46c2adfa2ea817c5ed9
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: ffa41e6727b064039a4c7354751af768,
       type: 2}
