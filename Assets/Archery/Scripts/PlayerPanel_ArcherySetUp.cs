@@ -79,8 +79,8 @@ public class PlayerPanel_ArcherySetUp : MonoBehaviour
     }
 
     public void SetPlayerName(TMP_Text text)
-    {
-        ArcheryGameManager._players[playerNum].playerName = text.text;
+    {        
+        ArcheryGameManager._players[playerNum].playerName = text.text.Length <= 1 ? this.gameObject.name : text.text;
     }
 
     public void DestroyPanel()

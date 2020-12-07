@@ -32,6 +32,8 @@ public class ArrowManager : MonoBehaviour
     private bool arrowIsPrepared;
 
     float xSpeed;
+    public GameObject _playerModel { get; private set;}
+
 
 
     // Start is called before the first frame update
@@ -42,6 +44,8 @@ public class ArrowManager : MonoBehaviour
         arrowIsgettingThrowed = false;
         target = GameObject.Find("ArcheryTarget");
         _OptionsButtons = GameObject.Find("OptionsButtons");
+        _playerModel = GameObject.Find("FinalPlayerModel");
+
     }
 
     void Update()
@@ -56,7 +60,9 @@ public class ArrowManager : MonoBehaviour
                 initialVelocity.y = 0f;
                 mainPhysics = false;
                 arrowIsPrepared = true;
-                arrowRenderer.ManageLineRenderer(true, 100);
+                arrowRenderer.ManageLineRenderer(true, 30);
+                _playerModel.GetComponent<PlayerAnimatorController>().SetTriggerAnim("AimArrow");
+
             }
             else if (Input.GetMouseButton(0))
             {
@@ -72,6 +78,7 @@ public class ArrowManager : MonoBehaviour
                 arrowIsPrepared = false;
                 arrowRenderer.ManageLineRenderer(false, 0);
                 GetComponent<Animator>().SetTrigger("ArrowThrow");
+                _playerModel.GetComponent<PlayerAnimatorController>().SetTriggerAnim("ShootArrow");
                 //StartCoroutine(ArrowAnim());
             }
 #else
@@ -82,7 +89,9 @@ public class ArrowManager : MonoBehaviour
                 initialVelocity.y = 0f;
                 mainPhysics = false;
                 arrowIsPrepared = true;
-                arrowRenderer.ManageLineRenderer(true, 100);
+                arrowRenderer.ManageLineRenderer(true, 30);
+                _playerModel.GetComponent<PlayerAnimatorController>().SetTriggerAnim("ShootArrow");
+
             }
             else if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
             {
@@ -98,6 +107,7 @@ public class ArrowManager : MonoBehaviour
                 arrowIsPrepared = false;
                 arrowRenderer.ManageLineRenderer(false, 0);
                 GetComponent<Animator>().SetTrigger("ArrowThrow");
+                _playerModel.GetComponent<PlayerAnimatorController>().SetTriggerAnim("AimArrow");
                 //StartCoroutine(ArrowAnim());
             }
 #endif
@@ -181,7 +191,7 @@ public class ArrowManager : MonoBehaviour
         yield return null;
     }
 
-    private void OnGUI()
+    /*private void OnGUI()
     {
         float size = 100;
         GUIStyle style = new GUIStyle
@@ -195,6 +205,6 @@ public class ArrowManager : MonoBehaviour
         };
         
         GUI.Label(new Rect(Screen.width / 2 - size, Screen.height / 2 - size, size, size), gUIContent, style);
-    }
+    }*/
 }
 

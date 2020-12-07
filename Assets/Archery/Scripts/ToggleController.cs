@@ -27,7 +27,9 @@ public class ToggleController : MonoBehaviour
         {
             _bg.color = new Color(_bg.color.r, _bg.color.g, _bg.color.b, _disAlpha);
             PlayerPanel_ArcherySetUp._colorsDic[_name] = false;
-            PlayerPanel_ArcherySetUp._toggles[_name].ForEach(x => x.interactable = true);
+            PlayerPanel_ArcherySetUp._toggles[_name].ForEach(delegate (Toggle toggle) {
+                if (toggle != null) toggle.interactable = true;
+            });
 
         }
 
@@ -35,7 +37,9 @@ public class ToggleController : MonoBehaviour
         {
             _bg.color = new Color(_bg.color.r, _bg.color.g, _bg.color.b, 1f);
             PlayerPanel_ArcherySetUp._colorsDic[_name] = true;
-            PlayerPanel_ArcherySetUp._toggles[_name].ForEach(x => x.interactable = false);
+            PlayerPanel_ArcherySetUp._toggles[_name].ForEach(delegate (Toggle toggle) {
+                if (toggle != null) toggle.interactable = false;
+            });
             _archerySetUp.SetPlayerColor(name);
         }
     }
@@ -51,7 +55,9 @@ public class ToggleController : MonoBehaviour
         if (!selected && PlayerPanel_ArcherySetUp._colorsDic[_name])
         {
             PlayerPanel_ArcherySetUp._colorsDic[_name] = false;
-            PlayerPanel_ArcherySetUp._toggles[_name].ForEach(x => x.interactable = true);
+            PlayerPanel_ArcherySetUp._toggles[_name].ForEach(delegate (Toggle toggle) {
+                if (toggle != null) toggle.interactable = true;
+            });
         }
 
     }

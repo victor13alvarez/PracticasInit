@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInfo : IComparable<PlayerInfo> , IComparer<PlayerInfo>
+public class PlayerInfo
 {
     public List<int> roundScore { get; set; }
     public int finalScore { get; set; }
@@ -11,6 +9,7 @@ public class PlayerInfo : IComparable<PlayerInfo> , IComparer<PlayerInfo>
     public Color playerColor { get; set; }
     public GameObject playerPanel { get; }
     public string playerName { get; set; }
+    public int playerCount { get; private set; }
 
     public PlayerInfo(GameObject ppanel)
     {
@@ -18,15 +17,6 @@ public class PlayerInfo : IComparable<PlayerInfo> , IComparer<PlayerInfo>
         playerColor = Color.black;
         playerPanel = ppanel;
         playerName = "Player " + (ArcheryGameManager._players.Count + 1);
-    }
-
-    public int Compare(PlayerInfo x, PlayerInfo y)
-    {
-        return x.finalScore.CompareTo(y.finalScore);
-    }
-
-    public int CompareTo(PlayerInfo other)
-    {
-        return finalScore >= other.finalScore ? 0 : 1;
+        playerCount = ArcheryGameManager._players.Count + 1;
     }
 }

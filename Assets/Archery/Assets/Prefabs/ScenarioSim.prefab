@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 316804416797076857}
   - component: {fileID: 3312067353121481764}
   m_Layer: 0
-  m_Name: 10480_Archery_target_v1_max2011_iteration-2.001
+  m_Name: Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39,7 +39,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 108984384272562903}
-  m_Mesh: {fileID: -9028352226554426095, guid: 52e103c49a660480bbc23270201ce9cf, type: 3}
+  m_Mesh: {fileID: 3686967966316635703, guid: 52e103c49a660480bbc23270201ce9cf, type: 3}
 --- !u!23 &3312067353121481764
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -104,7 +104,7 @@ Transform:
   m_GameObject: {fileID: 1726787672313946219}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.03, y: 0.03, z: 0.03}
+  m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
   m_Children:
   - {fileID: 837961825454205501}
   m_Father: {fileID: 0}
@@ -157,7 +157,7 @@ MeshCollider:
   serializedVersion: 4
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: -9028352226554426095, guid: 52e103c49a660480bbc23270201ce9cf, type: 3}
+  m_Mesh: {fileID: 3686967966316635703, guid: 52e103c49a660480bbc23270201ce9cf, type: 3}
 --- !u!54 &1713927164388614583
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -186,7 +186,7 @@ GameObject:
   - component: {fileID: 4772884490977631437}
   - component: {fileID: 9112903513370996712}
   m_Layer: 0
-  m_Name: 10480_Archery_target_v1_max2011_iteration-2
+  m_Name: WoodPart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -213,7 +213,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6832474323783202957}
-  m_Mesh: {fileID: -8077316046263581196, guid: 52e103c49a660480bbc23270201ce9cf, type: 3}
+  m_Mesh: {fileID: 6592661659779975461, guid: 52e103c49a660480bbc23270201ce9cf, type: 3}
 --- !u!23 &9112903513370996712
 MeshRenderer:
   m_ObjectHideFlags: 0

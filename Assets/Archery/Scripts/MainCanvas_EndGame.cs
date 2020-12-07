@@ -1,59 +1,41 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 public class MainCanvas_EndGame : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI m_TextComponent;
-    [SerializeField] private float FadeSpeed = 20.0f;
-    [SerializeField] private int RolloverCharacterSpread = 10;
-    [SerializeField] private GameObject _PlayerWon;
+    public TextMeshProUGUI m_TextComponent;
+    public int RolloverCharacterSpread = 2;
+    public GameObject _PlayerWon;
     TextMeshProUGUI _playerWonText;
-    const string _hasWin = " HAS WIN";
+    const string _hasWin = " HAS WON";
+    public float FadeSpeed = .5f;
+    public Color ColorTint;
+    float scale;
 
     private void Awake()
     {
         _playerWonText = _PlayerWon.GetComponent<TextMeshProUGUI>();
         _playerWonText.text = "";
+    }
 
+    private void Update()
+    {
+         scale = Mathf.Lerp(.8f, 1.1f, Mathf.PingPong(Time.time, 1));
+        _PlayerWon.transform.localScale = new Vector3(scale,scale,scale);
     }
     public void FadeInTransitionComplete()
     {
-        StartCoroutine(FadeInText());
-        PlayerHasWon();
-    }
-
-    void PlayerHasWon()
-    {
+        StartCoroutine(AnimateVertexColors());
         _playerWonText.text = ArcheryGameManager._playerHasWin + _hasWin;
-        StartCoroutine(ScaleUpAndDown(_PlayerWon.transform, Vector3.one, 1f));
     }
 
-
-
-    IEnumerator ScaleUpAndDown(Transform transform, Vector3 upScale, float duration)
-    {
-        Vector3 initialScale = transform.localScale;
-
-        for (float time = 0; time < duration * 2; time += Time.deltaTime)
-        {
-            float progress = Mathf.PingPong(time, duration) / duration;
-            transform.localScale = Vector3.Lerp(initialScale, upScale, progress);
-            yield return null;
-        }
-        transform.localScale = initialScale;
-        if(transform.localScale == Vector3.one) StartCoroutine(ScaleUpAndDown(_PlayerWon.transform, Vector3.one, 1f));
-        else StartCoroutine(ScaleUpAndDown(_PlayerWon.transform, Vector3.one /2, 1f));
-
-    }
-    // ...
     /// <summary>
-    /// Method to animate (fade in) vertex colors of a TMP Text object.
+    /// Method to animate vertex colors of a TMP Text object.
     /// </summary>
     /// <returns></returns>
-    IEnumerator FadeInText()
+    IEnumerator AnimateVertexColors()
     {
         // Set the whole text transparent
         m_TextComponent.color = new Color
@@ -133,7 +115,7 @@ public class MainCanvas_EndGame : MonoBehaviour
 
             if (currentCharacter + 1 < characterCount) currentCharacter += 1;
 
-            yield return new WaitForEndOfFrame();
+            yield return new WaitForSeconds(0.25f - FadeSpeed * 0.01f);
         }
     }
 

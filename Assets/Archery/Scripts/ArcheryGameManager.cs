@@ -17,6 +17,8 @@ public class ArcheryGameManager : MonoBehaviour
     WindSimulation _windSimulation;
 
     public static string _playerHasWin = "";
+    int _maximumScorePlayer = 0;
+
 
     #region VariableMethods
 
@@ -106,6 +108,7 @@ public class ArcheryGameManager : MonoBehaviour
             //TODO POPUP nuevo jugador
             Invoke(nameof(DestroyArrows), 1f);
             StartCoroutine(WaitBetweenPlayerChanges()); //NEEDED FOR SMOOTH TRANSITIONS BETWEEN ANIMATIONS
+            StartCoroutine(ChangeColorPlayer());
         }
         else
             _arrowManager.SpawnNewArrow(this);
@@ -117,6 +120,20 @@ public class ArcheryGameManager : MonoBehaviour
         _canvasInputArcheryGame.NewPlayerTurn(_players[_currentPlayer].playerName, _currentPlayer);
     }
 
+    IEnumerator ChangeColorPlayer()
+    {
+        Color targetColor = _players[_currentPlayer].playerColor;
+        float elapsedTime = 0f;
+        float totalTime = 20f;
+        Material mat = _arrowManager._playerModel.GetComponentInChildren<SkinnedMeshRenderer>().material;
+        while (elapsedTime < totalTime)
+        {
+            mat.color = Color.Lerp(mat.color, targetColor, elapsedTime / totalTime);
+            elapsedTime += Time.deltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+        yield return null;
+    }
 
     void ManagePlayerScore(int score) //After an arrow is shoot, update currentplayer score
     {
@@ -129,6 +146,7 @@ public class ArcheryGameManager : MonoBehaviour
 
         //TODO Cambiar score jugador
         _canvasInputArcheryGame.UpdatePlayerScore(_players[_currentPlayer].roundScore[_currentRound - 1]);
+        _maximumScorePlayer = _players[_currentPlayer].finalScore > _players[_maximumScorePlayer].finalScore ? _currentPlayer : _maximumScorePlayer;
     }
 
     void DestroyArrows() // Destroy every arrow on scenario
@@ -158,6 +176,7 @@ public class ArcheryGameManager : MonoBehaviour
         SetUpOtherSceneGObj();
         ManageRounds();
         _canvasInputArcheryGame.NewPlayerTurn(_players[_currentPlayer].playerName, _currentPlayer);
+        _arrowManager._playerModel.GetComponentInChildren<SkinnedMeshRenderer>().material.color = _players[_currentPlayer].playerColor;
     }
 
     public void ResetGame()
@@ -173,7 +192,6 @@ public class ArcheryGameManager : MonoBehaviour
     #endregion
     private void GetPlayerWin()
     {
-        _players.Sort();
-        _playerHasWin = _players[0].playerName;
+        _playerHasWin = _players[_maximumScorePlayer].playerName;
     }
 }
